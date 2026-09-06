@@ -115,5 +115,23 @@ EOF
         always {
             archiveArtifacts(artifacts: 'semgrep-results.json, snyk-report.json, snyk-debug.log', allowEmptyArchive: true)
         }
+        success {
+            script {
+                if (env.BRANCH_NAME == 'main') {
+                    slackSend(
+                        channel: '#od-daa',
+                        color: 'good',
+                        message: "✅ New Docker image published: `${DOCKER_IMAGE}:${APP_VERSION}-${IMAGE_TAG}` → Nexus (docker-snapshots) — <${env.BUILD_URL}|View build>"
+                    )
+                }
+            }
+        }
+        failure {
+            slackSend(
+                channel: '#od-daa',
+                color: 'danger',
+                message: "❌ Pipeline failed on branch `${env.BRANCH_NAME}` — <${env.BUILD_URL}|View logs>"
+            )
+        }
     }
 }
