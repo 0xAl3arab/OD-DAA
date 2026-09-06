@@ -116,21 +116,17 @@ EOF
             archiveArtifacts(artifacts: 'semgrep-results.json, snyk-report.json, snyk-debug.log', allowEmptyArchive: true)
         }
         success {
-            script {
-                if (env.BRANCH_NAME == 'main') {
-                    slackSend(
-                        channel: '#od-daa',
-                        color: 'good',
-                        message: "✅ New Docker image published: `${DOCKER_IMAGE}:${APP_VERSION}-${IMAGE_TAG}` → Nexus (docker-snapshots) — <${env.BUILD_URL}|View build>"
-                    )
-                }
-            }
+            slackSend(
+                channel: '#saham-libs',
+                color: 'good',
+                message: "📦 New library version published to Nexus: `Socle-CDC:${APP_VERSION}` — <${env.BUILD_URL}|View build>"
+            )
         }
         failure {
             slackSend(
-                channel: '#od-daa',
+                channel: '#saham-libs',
                 color: 'danger',
-                message: "❌ Pipeline failed on branch `${env.BRANCH_NAME}` — <${env.BUILD_URL}|View logs>"
+                message: "❌ Library pipeline failed for `Socle-CDC` — <${env.BUILD_URL}|View logs>"
             )
         }
     }
