@@ -16,6 +16,12 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'mvn clean install -DskipTests'
+                script {
+                    env.APP_VERSION = sh(
+                        script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout",
+                        returnStdout: true
+                    ).trim()
+                }
             }
         }
 
@@ -74,8 +80,8 @@ pipeline {
                 branch 'main'
             }
             steps {
-                sh "docker build -t ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE}:${IMAGE_TAG} ."
-                sh "docker tag ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE}:${IMAGE_TAG} ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest"
+                sh "docker build -t ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE}:${APP_VERSION}-${IMAGE_TAG} ."
+                sh "docker tag ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE}:${APP_VERSION}-${IMAGE_TAG} ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest"
             }
         }
 
@@ -97,7 +103,7 @@ pipeline {
   }
 }
 EOF
-                        docker push ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE}:${IMAGE_TAG}
+                        docker push ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE}:${APP_VERSION}-${IMAGE_TAG}
                         docker push ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest
                     '''
                 }
