@@ -1,2 +1,37 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: saham-workflow-core
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/saham}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_SERVER_URL:http://localhost:8082}/realms/${KEYCLOAK_REALM:Saham}
+
 server:
-  port : 8085
+  port: 8085
+
+app:
+  keycloak:
+    server-url: ${KEYCLOAK_SERVER_URL:http://localhost:8082}
+    realm: ${KEYCLOAK_REALM:Saham}
+    client-id: ${KEYCLOAK_CLIENT_ID:backend}
+    client-secret: ${KEYCLOAK_CLIENT_SECRET}
+    admin:
+      username: ${KEYCLOAK_ADMIN_USERNAME}
+      password: ${KEYCLOAK_ADMIN_PASSWORD}
+      client-id: ${KEYCLOAK_A.envDMIN_CLIENT_ID:admin-cli}

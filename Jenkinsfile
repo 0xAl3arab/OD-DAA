@@ -61,17 +61,19 @@ pipeline {
             }
         }
 
-        stage('Snyk SCA Scan') {
-            steps {
-                withCredentials([string(credentialsId: 'Snyk', variable: 'SNYK_TOKEN')]) {
-                    sh '''
-                        SNYK_BIN=/var/jenkins_home/tools/io.snyk.jenkins.tools.SnykInstallation/Snyk/snyk-linux
-                        $SNYK_BIN auth "$SNYK_TOKEN" || true
-                        $SNYK_BIN test --org=0394a8ef-9320-4dce-8cf8-ce5a1e7a4694 --json --severity-threshold=low > snyk-report.json 2> snyk-debug.log || true
-                    '''
-                }
-            }
-        }
+    stage('Snyk SCA Scan') {
+               steps {
+                   withCredentials([string(credentialsId: 'Snyk', variable: 'SNYK_TOKEN')]) {
+                       sh '''
+                           chmod +x ./mvnw
+                           SNYK_BIN=/var/jenkins_home/tools/io.snyk.jenkins.tools.SnykInstallation/Snyk/snyk-linux
+                           $SNYK_BIN auth "$SNYK_TOKEN" || true
+                           $SNYK_BIN test --org=0394a8ef-9320-4dce-8cf8-ce5a1e7a4694 --json --severity-threshold=low > snyk-report.json 2> snyk-debug.log || true
+                           $SNYK_BIN monitor --org=0394a8ef-9320-4dce-8cf8-ce5a1e7a4694 --prune-repeated-subdependencies || true
+                       '''
+                   }
+               }
+           }
 
         // ---- Everything below only runs after merge to main, not on PRs ----
 
